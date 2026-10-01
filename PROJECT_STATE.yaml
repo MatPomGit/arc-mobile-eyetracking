@@ -12,8 +12,8 @@ research_phase: protocol_and_implementation_definition
 evidence_state:
   android_ui_scaffold: available_truthful_placeholders
   typed_measurement_contract: available
-  measurement_contract_tests: added_pending_execution
-  android_ci_workflow: configured_pending_first_observed_run
+  measurement_contract_tests: passed_android_ci_2026_10_01
+  android_ci_workflow: passing
   camera_pipeline: not_implemented
   gaze_estimation_engine: not_implemented
   calibration_engine: not_implemented
