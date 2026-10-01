@@ -1,0 +1,47 @@
+schema_version: 1
+project: ARC Mobile Eye Tracking
+updated: 2026-10-01
+purpose: "Machine-readable research and publication state for cross-repository portfolio management."
+repository:
+  canonical_branch: main
+  architecture: android_software_scaffold
+  app_root: app
+research_phase: research_mapping_required
+evidence_state:
+  android_project: available
+  research_protocol: not_identified
+  manuscript: not_identified
+  validation_evidence: not_identified
+current_blockers:
+  - id: PUBLICATION_MAPPING
+    priority: P0
+    status: open
+    source: PROJECT_STATE.yaml
+    exit_condition: "Scientific question, intended manuscript(s), protocol, evidence boundary and validation plan are explicitly documented."
+next_actions:
+  - order: 1
+    id: DEFINE_RESEARCH_MAPPING
+    action: "Define whether this repository is an independent publication project or a software component of another research programme, then document its scientific question and evidence plan."
+portfolio_control:
+  schema_version: 1
+  manager: "ChatGPT Project: Publikacje na GitHubie"
+  last_reviewed: 2026-10-01
+  overall_stage: unmapped
+  health: needs_research_definition
+  primary_next_action: DEFINE_RESEARCH_MAPPING
+  publication_count:
+    active: 0
+    unmapped: 1
+  papers: []
+  update_triggers:
+    - publication_mapping_defined
+    - protocol_added
+    - validation_evidence_added
+    - manuscript_created
+ai_handoff:
+  read_first:
+    - PROJECT_STATE.yaml
+    - settings.gradle.kts
+  do_not_infer:
+    - a publication claim from the existence of application code
+    - research validity from software build success
