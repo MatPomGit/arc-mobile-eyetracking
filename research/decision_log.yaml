@@ -1,0 +1,29 @@
+version: 1
+status: active
+decisions:
+  - id: D-2026-10-01-001
+    date: 2026-10-01
+    decision: "Treat the repository as an independent measurement-validation research programme, beginning with controlled screen-space gaze validation."
+    rationale:
+      - define a falsifiable scientific contribution beyond an Android UI
+      - separate measurement validation from later application use
+    affected_artifacts:
+      - PROJECT_STATE.yaml
+      - docs/research_plan.md
+      - docs/measurement_contract.md
+  - id: D-2026-10-01-002
+    date: 2026-10-01
+    decision: "Represent invalid tracking explicitly instead of emitting synthetic coordinates such as (0,0)."
+    rationale:
+      - preserve scientific missingness and failure-rate information
+      - prevent downstream analyses from interpreting tracking loss as gaze
+    affected_artifacts:
+      - app/src/main/java/com/edu/eyetracking/measurement/GazeMeasurement.kt
+  - id: D-2026-10-01-003
+    date: 2026-10-01
+    decision: "Do not retain raw face/room video by default."
+    rationale:
+      - minimize privacy risk
+      - derived gaze measurements are the primary research output
+    affected_artifacts:
+      - docs/measurement_contract.md
