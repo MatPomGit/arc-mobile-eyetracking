@@ -1,0 +1,19 @@
+version: 1
+status: active
+deviations: []
+record_schema:
+  required:
+    - deviation_id
+    - date
+    - experiment_id
+    - affected_protocol_or_config
+    - description
+    - reason
+    - impact_assessment
+    - disposition
+  recommended:
+    - participant_or_device_scope
+    - evidence_ids
+    - corrective_action
+    - manuscript_reporting_required
+rule: "Any post-freeze change to calibration, target geometry, quality thresholds, estimator or exclusions that can alter interpretation must be logged."
