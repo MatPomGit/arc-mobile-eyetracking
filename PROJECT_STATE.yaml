@@ -10,7 +10,10 @@ repository:
   measurement_contract: docs/measurement_contract.md
 research_phase: protocol_and_implementation_definition
 evidence_state:
-  android_ui_scaffold: available
+  android_ui_scaffold: available_truthful_placeholders
+  typed_measurement_contract: available
+  measurement_contract_tests: added_pending_execution
+  android_ci_workflow: configured_pending_first_observed_run
   camera_pipeline: not_implemented
   gaze_estimation_engine: not_implemented
   calibration_engine: not_implemented
@@ -32,7 +35,7 @@ current_blockers:
 next_actions:
   - order: 1
     id: IMPLEMENT_MEASUREMENT_CORE
-    action: "Replace the current UI-only tracking placeholders with a versioned measurement core: camera acquisition, estimator interface, calibration, quality/failure states and research export."
+    action: "Implement camera acquisition, estimator adapter, calibration and research export behind the existing typed measurement contract; truthful UI placeholders and measurement invariants already exist."
     requires_participants: false
   - order: 2
     id: ADD_SOFTWARE_VALIDATION
