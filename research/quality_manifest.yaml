@@ -1,0 +1,27 @@
+schema_version: 1
+project: arc-mobile-eyetracking
+updated: 2026-10-01
+status: active
+artifacts:
+  project_state: {path: PROJECT_STATE.yaml, status: active}
+  agent_rules: {path: AGENTS.md, status: active}
+  research_plan: {path: docs/research_plan.md, status: active}
+  measurement_contract: {path: docs/measurement_contract.md, status: active}
+  evidence_registry: {path: research/evidence_registry.yaml, status: active}
+  claim_ledger: {path: research/claim_ledger.yaml, status: active}
+  risk_register: {path: research/risk_register.yaml, status: active}
+  decision_log: {path: research/decision_log.yaml, status: active}
+  deviation_log: {path: research/deviation_log.yaml, status: active}
+  literature_search_log: {path: research/literature_search_log.yaml, status: active}
+  negative_results: {path: research/negative_results.md, status: active}
+  data_management: {path: docs/data_management_plan.md, status: active}
+  reproducibility: {path: docs/reproducibility.md, status: active}
+  statistical_reporting: {path: docs/statistical_reporting_policy.md, status: active}
+  publication_release: {path: docs/publication_release_checklist.md, status: active}
+  android_ci: {path: .github/workflows/android-ci.yml, status: passing}
+quality_rules:
+  - "Do not infer gaze validity from software execution alone."
+  - "Keep software, controlled-target, cross-device and external-reference evidence separate."
+  - "Never encode tracking loss as a fake coordinate."
+  - "Do not tune on final held-out evaluation targets."
+  - "Raw face/room video is not retained or exported by default."
