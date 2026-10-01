@@ -1,0 +1,30 @@
+version: 1
+status: pre_human_validation
+evidence: []
+record_schema:
+  required:
+    - evidence_id
+    - date
+    - evidence_class
+    - source_commit
+    - app_version
+    - estimator_version
+    - calibration_version
+    - protocol_version
+    - artifact_path_or_external_id
+    - immutable_identifier_or_sha256
+    - permitted_uses
+  recommended:
+    - device_profile
+    - target_set_version
+    - participant_scope
+    - exclusion_summary
+    - quality_notes
+evidence_classes:
+  - software_or_synthetic
+  - controlled_screen_target
+  - robustness
+  - cross_device
+  - external_reference
+  - derived_result_bundle
+note: "Register only evidence that exists. Do not place participant-level data or raw video in public Git."
