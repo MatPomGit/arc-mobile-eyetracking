@@ -1,0 +1,18 @@
+version: 1
+status: active
+searches: []
+record_schema:
+  required:
+    - id
+    - date
+    - topic
+    - systems
+    - queries
+    - inclusion_notes
+    - exclusion_notes
+    - retained_sources
+  recommended:
+    - date_scope
+    - unresolved_gaps
+    - performed_by
+note: "Record substantial literature updates on mobile gaze estimation, calibration, evaluation metrics, robustness and external-reference validation."
