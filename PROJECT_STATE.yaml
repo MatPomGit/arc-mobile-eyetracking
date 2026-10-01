@@ -73,6 +73,7 @@ portfolio_control:
     - submission_status_change
 ai_handoff:
   read_first:
+    - research/quality_manifest.yaml
     - PROJECT_STATE.yaml
     - README.md
     - docs/research_plan.md
