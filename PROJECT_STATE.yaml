@@ -4,48 +4,82 @@ updated: 2026-10-01
 purpose: "Machine-readable research and publication state for cross-repository portfolio management."
 repository:
   canonical_branch: main
-  architecture: android_software_scaffold
+  architecture: android_measurement_research_scaffold
   app_root: app
-research_phase: research_mapping_required
+  research_plan: docs/research_plan.md
+  measurement_contract: docs/measurement_contract.md
+research_phase: protocol_and_implementation_definition
 evidence_state:
-  android_project: available
-  research_protocol: not_identified
-  manuscript: not_identified
-  validation_evidence: not_identified
+  android_ui_scaffold: available
+  camera_pipeline: not_implemented
+  gaze_estimation_engine: not_implemented
+  calibration_engine: not_implemented
+  research_export: not_implemented
+  software_validation: not_run
+  participant_validation_data: not_collected
+  external_reference_validation: not_collected
 current_blockers:
-  - id: PUBLICATION_MAPPING
+  - id: MEASUREMENT_IMPLEMENTATION
     priority: P0
     status: open
-    source: PROJECT_STATE.yaml
-    exit_condition: "Scientific question, intended manuscript(s), protocol, evidence boundary and validation plan are explicitly documented."
+    source: docs/measurement_contract.md
+    exit_condition: "Versioned camera, estimator, calibration, quality-state and export pipelines exist with deterministic software/integration tests."
+  - id: E01_PROTOCOL_FREEZE
+    priority: P0
+    status: open
+    source: docs/research_plan.md
+    exit_condition: "Controlled calibration/held-out target protocol, metrics, conditions, exclusions, repetition rule and applicable governance route are frozen before participant collection."
 next_actions:
   - order: 1
-    id: DEFINE_RESEARCH_MAPPING
-    action: "Define whether this repository is an independent publication project or a software component of another research programme, then document its scientific question and evidence plan."
+    id: IMPLEMENT_MEASUREMENT_CORE
+    action: "Replace the current UI-only tracking placeholders with a versioned measurement core: camera acquisition, estimator interface, calibration, quality/failure states and research export."
+    requires_participants: false
+  - order: 2
+    id: ADD_SOFTWARE_VALIDATION
+    action: "Add deterministic geometry/export tests and integration fixtures before interpreting any gaze output."
+    requires_participants: false
+  - order: 3
+    id: FREEZE_E01
+    action: "Freeze the controlled calibration and held-out fixation-target protocol plus privacy/ethics route."
+    requires_participants: false
+  - order: 4
+    id: RUN_E01
+    action: "Collect controlled human validation data only after the implementation and E01 gates pass."
+    requires_participants: true
 portfolio_control:
   schema_version: 1
   manager: "ChatGPT Project: Publikacje na GitHubie"
   last_reviewed: 2026-10-01
-  overall_stage: unmapped
-  health: needs_research_definition
-  primary_next_action: DEFINE_RESEARCH_MAPPING
+  overall_stage: protocol
+  health: blocked_by_measurement_implementation
+  primary_next_action: IMPLEMENT_MEASUREMENT_CORE
   publication_count:
-    active: 0
-    unmapped: 1
-  papers: []
+    active: 1
+  papers:
+    - id: P01
+      label: mobile_gaze_measurement_validation
+      working_title: "On-device Android gaze estimation as a research measurement instrument: calibration, accuracy, robustness and device effects"
+      stage: protocol
+      target_venue: null
+      next_gate: e01_protocol_and_implementation_readiness
   update_triggers:
-    - publication_mapping_defined
-    - protocol_added
-    - validation_evidence_added
-    - manuscript_created
+    - implementation_gate_change
+    - protocol_freeze
+    - validation_data_change
+    - manuscript_stage_change
+    - submission_status_change
 ai_handoff:
   read_first:
     - PROJECT_STATE.yaml
-    - settings.gradle.kts
+    - README.md
+    - docs/research_plan.md
+    - docs/measurement_contract.md
+    - app/src/main/java/com/edu/eyetracking/MainActivity.kt
   do_not_infer:
-    - a publication claim from the existence of application code
-    - research validity from software build success
-
+    - gaze tracking from the existence of calibration/tracking UI
+    - research validity from successful Android build
+    - laboratory-equivalent accuracy without external reference evidence
+    - diagnostic or clinical value from gaze coordinates
 portfolio_dashboard:
   url: "https://docs.google.com/spreadsheets/d/1wpRTxGKL-0tPHn-dCzZLkTDNBkF4q2juCe5S9-YUZsM/edit"
   role: "Central derivative view for cross-repository publication and research management."
