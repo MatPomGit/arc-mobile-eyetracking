@@ -172,10 +172,10 @@ fun HomeScreen(
 @Composable
 fun ModulesScreen(modifier: Modifier = Modifier) {
     val modules = listOf(
-        "Moduł Standardowy",
-        "Moduł Precyzyjny",
-        "Moduł Szybkiego Śledzenia",
-        "Moduł Niskiego Poboru Energii"
+        "Akwizycja obrazu z przedniej kamery — do implementacji",
+        "Estymator punktu patrzenia — do implementacji",
+        "Kalibracja uczestnika — do implementacji",
+        "Kontrola jakości i eksport badawczy — do implementacji"
     )
 
     Column(
@@ -194,8 +194,11 @@ fun ModulesScreen(modifier: Modifier = Modifier) {
                 ListItem(
                     headlineContent = { Text(moduleName) },
                     trailingContent = {
-                        Button(onClick = { /* TODO: Wybierz moduł */ }) {
-                            Text("Wybierz")
+                        Button(
+                            onClick = {},
+                            enabled = false,
+                        ) {
+                            Text("Planowany")
                         }
                     }
                 )
@@ -223,8 +226,15 @@ fun CalibrationScreen(modifier: Modifier = Modifier) {
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(vertical = 16.dp)
         )
-        Button(onClick = { /* TODO: Rozpocznij kalibrację */ }) {
-            Text("Rozpocznij kalibrację")
+        Text(
+            text = "Kalibracja nie jest jeszcze zaimplementowana. Ten ekran nie zapisuje pomiarów.",
+            textAlign = TextAlign.Center,
+        )
+        Button(
+            onClick = {},
+            enabled = false,
+        ) {
+            Text("Kalibracja niedostępna")
         }
     }
 }
@@ -243,11 +253,10 @@ fun TrackingScreen(modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.headlineMedium
         )
         Text(
-            text = "Trwa śledzenie wzroku...",
+            text = "Pipeline śledzenia wzroku nie jest jeszcze zaimplementowany. Ten ekran nie uruchamia kamery ani nie zapisuje danych gaze.",
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(vertical = 16.dp)
         )
-        // Tu można by dodać wizualizację punktu skupienia wzroku
     }
 }
 
