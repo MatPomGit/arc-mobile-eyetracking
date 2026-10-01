@@ -1,0 +1,23 @@
+version: 1
+status: pre_results
+claims: []
+record_schema:
+  required:
+    - paper_id
+    - claim_id
+    - claim_text_or_scope
+    - claim_class
+    - evidence_ids
+    - analysis_artifacts
+    - status
+  recommended:
+    - citation_keys
+    - limitations
+claim_classes:
+  - engineering
+  - controlled_validation
+  - robustness
+  - cross_device
+  - external_agreement
+  - exploratory
+rule: "Internal screen-target validation does not establish equivalence to a laboratory eye tracker."
