@@ -1,0 +1,82 @@
+version: 1
+status: active
+scope: mobile_gaze_measurement_programme
+risks:
+  - id: RSK-001
+    category: measurement_validity
+    risk: estimator_output_is_interpreted_as_valid_gaze_before_controlled_validation
+    impact: high
+    status: open
+    mitigation:
+      - evidence_classes
+      - held_out_screen_targets
+      - claim_ledger
+    trigger: accuracy_claim_without_controlled_validation
+  - id: RSK-002
+    category: calibration
+    risk: calibration_and_evaluation_targets_are_not_independent
+    impact: high
+    status: open
+    mitigation:
+      - separate_calibration_and_held_out_targets
+      - frozen_target_set_versions
+    trigger: evaluation_target_used_to_fit_or_tune_calibration
+  - id: RSK-003
+    category: missingness
+    risk: tracking_loss_is_encoded_as_a_valid_coordinate
+    impact: high
+    status: mitigated_in_contract
+    mitigation:
+      - explicit_GazeStatus
+      - nullable_point_for_invalid_samples
+      - unit_tests
+    trigger: invalid_sample_contains_unqualified_valid_coordinate
+  - id: RSK-004
+    category: device_heterogeneity
+    risk: performance_on_one_phone_is_generalized_to_unsupported_devices
+    impact: high
+    status: open
+    mitigation:
+      - cross_device_qualification
+      - device_profile_provenance
+      - supported_device_envelope
+    trigger: claim_exceeds_tested_device_classes
+  - id: RSK-005
+    category: robustness
+    risk: head_pose_distance_or_illumination_confounds_accuracy_estimates
+    impact: high
+    status: open
+    mitigation:
+      - prespecified_robustness_conditions
+      - condition_specific_failure_reporting
+    trigger: aggregate_accuracy_hides_condition_failure
+  - id: RSK-006
+    category: privacy
+    risk: face_room_video_or_device_identifier_is_retained_or_exported_without_need
+    impact: high
+    status: open
+    mitigation:
+      - local_processing_default
+      - raw_video_not_retained_by_default
+      - no_hardware_identifier_as_participant_id
+      - data_management_plan
+    trigger: raw_media_or_direct_device_identifier_enters_research_export
+  - id: RSK-007
+    category: reference_validation
+    risk: internal_target_error_is_described_as_equivalence_to_lab_eye_tracker
+    impact: high
+    status: open
+    mitigation:
+      - separate_external_reference_evidence_class
+      - explicit_agreement_protocol
+    trigger: laboratory_equivalence_claim_without_reference_evidence
+  - id: RSK-008
+    category: reproducibility
+    risk: result_lacks_estimator_calibration_app_device_or_protocol_version
+    impact: medium
+    status: open
+    mitigation:
+      - evidence_registry
+      - measurement_contract
+      - immutable_result_bundle
+    trigger: reportable_result_has_incomplete_provenance
