@@ -1,14 +1,23 @@
 Metaanaliza metod śledzenia wzroku na urządzeniach mobilnych
+
 Streszczenie
+
 Śledzenie wzroku („eye tracking”) na smartfonach i tabletach ewoluowało od prototypów wymagających dodatkowego sprzętu (zewnętrzne kamery/komputery) do algorytmów działających na „niezmodyfikowanych” urządzeniach, głównie w oparciu o przednią kamerę RGB oraz coraz częściej o czujniki głębi (RGB‑D) i NIR/IR. W literaturze dominują podejścia appearance‑based (uczenie odwzorowania obraz→spojrzenie), które dzięki dużym zbiorom danych (np. GazeCapture) i sieciom CNN osiągnęły błędy rzędu ~1–3 cm na ekranie, przy czym personalizacja/kalibracja potrafi znacząco obniżyć błąd (np. do ~0.46 cm w warunkach „optymalnego UX”). [1] Kluczową barierą praktyczną wciąż pozostaje utrzymanie dokładności w ruchu (zmiana postawy, odległości, orientacji telefonu i głowy) oraz koszt obliczeniowy (latencja, energia, pamięć). Nowsze prace mobilne pokazują, że (a) modele temporalne (CNN+GRU/LSTM) poprawiają estymację dla bodźców dynamicznych, (b) fuzja RGB+Depth redukuje błąd w zróżnicowanych kontekstach użycia, a (c) czujniki inercyjne (IMU) mogą uruchamiać ciągłą rekalkibrację/uczenie ciągłe w odpowiedzi na wykrytą zmianę ruchu. [2] Metaanaliza ilościowa jest ograniczona przez silną heterogeniczność: różne zbiory danych, definicje błędu (cm vs stopnie), protokoły kalibracji, odległości obserwacji i zakresy ruchu. ‍Literatura przeglądowa podkreśla brak standaryzacji metryk i procedur oceny, co utrudnia „uczciwe” porównania między pracami. [3]
+
 Metodologia przeglądu i ramy porównania
+
 Zakres raportu obejmuje metody śledzenia punktu spojrzenia na ekranie (2D PoG w cm) i/lub kierunku spojrzenia (3D, błąd kątowy w °) na urządzeniach mobilnych (smartfony, tablety). Rdzeń przeglądu oparto na: (a) publikacjach przeglądowych i benchmarkach (m.in. przegląd mobilny Lei i in.; przekrojowy przegląd konsumenckich platform Kar & Corcoran; przegląd/benchmark deep‑learning appearance‑based Cheng i in.), (b) kluczowych pracach źródłowych dla mobilnej estymacji spojrzenia (Krafka/iTracker, Valliappan/Google Research, RGBDGaze, prace o bodźcach dynamicznych i optymalizacji na edge), oraz (c) wybranych patentach dot. gaze tracking w urządzeniach mobilnych. [4]
+
 Do porównań przyjęto następujące osie oceny (zaznaczając braki raportowania, gdy występują): dokładność (RMSE/średni błąd w cm na ekranie lub błąd kątowy w °), szybkość (FPS lub latencja/inference time), złożoność (liczba parametrów, ewentualnie FLOPs/pamięć), wymagania kalibracyjne (brak/implicit/explicit; koszt czasowy), odporność na oświetlenie i pozycję głowy/urządzenia, oraz sensorium (RGB, RGB‑D, NIR/IR, IMU). [5]
+
 Wątek „metaanalityczny” zrealizowano w praktyce jako: (i) analizy podgrupowe w obrębie tych samych zbiorów danych (np. DynamicGaze), (ii) porównania względne (procentowa poprawa vs baseline), oraz (iii) wykorzystanie testów istotności raportowanych w pracach (np. ANOVA+Tukey dla modeli na DynamicGaze). Pełna metaanaliza standaryzowana (np. efekt ujednolicony) jest zwykle niemożliwa bez dostępu do surowych rozkładów błędów lub jednolitych protokołów oceny. [6]
 Przegląd literatury i taksonomia metod
+
 Kontekst mobilny i „oś czasu”
+
 Przegląd MobileHCI wskazuje, że badania nad eye trackingiem na urządzeniach ręcznych zaczęły się już ok. 2002 r.; do ok. 2010 r. dominowały podejścia wymagające zewnętrznego sprzętu do przetwarzania w czasie rzeczywistym, po czym wzrost jakości kamer i mocy obliczeniowej umożliwił eye tracking „w pełni na urządzeniu” (lub z ograniczonym wsparciem edge). [7] W kolejnej fazie przełomem stały się: duże zbiory danych z crowdsourcingu (GazeCapture) i modele end‑to‑end (iTracker), a następnie przeniesienie ciężaru na personalizację, modele lekkie oraz odporność na dynamikę użycia (ruch, zmiany postawy, zmienne oświetlenie). [8]
 timeline
+
   title Kamienie milowe mobilnego eye trackingu (wybór)
   2002 : Wczesne prace MobileHCI nad gaze na handheldach (często z dodatkowym sprzętem)
   2016 : GazeCapture + iTracker: CNN dla telefonów/tabletów, 10–15 fps na urządzeniu
@@ -19,25 +28,45 @@ timeline
   2024-2025 : DynamicGaze + CNN+RNN, pomiary latencji i optymalizacje (quantization/pruning), edge intelligence
   2025 : Motion-aware continual calibration z IMU (MAC-Gaze): redukcja błędu w ruchu
 Źródła dla wydarzeń: przegląd mobilny oraz prace kamieniowe. [9]
+
 Główne klasy metod
+
 W literaturze konsumenckiej i mobilnej najczęściej wyróżnia się trzy rodziny: (1) model‑based (geometria oka, glinty/NIR, PCCR), (2) feature‑based (regresja na cechach typu źrenica/kąciki oczu), (3) appearance‑based (głębokie uczenie obraz→spojrzenie); współcześnie dominuje (3) ze względu na dostępność kamer RGB i danych oraz skalowalność. [10] Dla platform mobilnych kluczowe determinanty jakości to m.in. zakres ruchów głowy i urządzenia, odległość użytkownik–kamera, oświetlenie, zasłonięcie oczu, okulary oraz ograniczenia energetyczno‑obliczeniowe. [11]
+
 Architektury i sensory dla mobilnego gaze trackingu
+
 Appearance-based: CNN i warianty mobilne
+
 Klasyczny wzorzec mobilny to model wielowejściowy uczący się bezpośrednio regresji PoG na ekranie z: wycinka twarzy, wycinków oczu oraz „face grid” (maski wskazującej pozycję głowy w kadrze). iTracker (Krafka i in.) trenowany na GazeCapture raportuje błąd ~1.71 cm na telefonach i ~2.53 cm na tabletach bez kalibracji; z kalibracją błąd spada odpowiednio do ~1.34 cm i ~2.12 cm, a szybkość działania na urządzeniu klasy mobilnej to ok. 10–15 fps. [12]
+
 Przegląd handheld Lei i in. pokazuje, że wiele reprezentatywnych modeli appearance‑based buduje się na CNN (VGG/ResNet, ale też MobileNet‑V2 jako architektura „mobile‑friendly”), a nowsze prace wprowadzają również Transformers (np. GazeTR/ViT w kontekście benchmarków). [13] W praktyce mobilnej często stosuje się też pipeline: detekcja twarzy + standaryzacja (crop/resize/normalizacja) + estymacja PoG, co jest istotne, bo etap detekcji twarzy może dominować czas wykonania. [14]
+
 Temporalne: CNN + GRU/LSTM oraz motywacja dla bodźców dynamicznych
+
 W scenariuszach mobilnych (wideo, gry, AR) bodźce i ruch użytkownika wprowadzają korelacje czasowe, które modele pojedynczej klatki (frame‑based) tracą. W pracy o DynamicGaze zaproponowano trzy architektury: CNN (baseline) oraz CNN+GRU i CNN+LSTM, osiągając na DynamicGaze RMSE odpowiednio ~1.468 cm (CNN), ~1.091 cm (CNN+GRU) i ~0.955 cm (CNN+LSTM); autorzy raportują istotne statystycznie różnice (ANOVA F(3,396)=254.42, p<0.001; Tukey: CNN+LSTM najlepszy). [15] To empirycznie wspiera tezę, że jawne modelowanie czasu pomaga w warunkach dynamicznych, choć okupione jest zwykle większą latencją i złożonością. [14]
+
 Model-based: geometria oka, PCCR i powiązanie z NIR/IR
+
 Model‑based gaze tracking w wersji klasycznej wykorzystuje NIR LED do generowania refleksów (glints) na rogówce i estymuje spojrzenie z relacji między pozycją źrenicy a glintami; to podejście znane jako PCCR jest powszechne w komercyjnych eye trackerach. [16] W urządzeniach mobilnych w „czystej” postaci jest trudniejsze (brak dedykowanego oświetlenia i stabilnej geometrii), ale staje się realniejsze wraz z obecnością czujników NIR/IR i/lub głębi w niektórych smartfonach. [17]
+
 Hybrydowe: łączenie appearance i cech geometrycznych
+
 EasyGaze jest przykładem podejścia hybrydowego: detekcja twarzy/oczu służy do znalezienia punktów cech (feature points), a następnie wyznacza się wektory (np. kącik–źrenica) używane do obliczenia współrzędnych fiksacji; raportowana średnia dokładność to ok. 1.93° przy rozdzielczości obrazu 96×48 px w sprzyjającym oświetleniu (z przodu). [18] Hybrydy często interpretować można jako „CNN do ekstrakcji/punktów + geometria do mapowania”, co bywa korzystne, gdy chcemy kontrolować zachowanie modelu poza rozkładem treningowym (np. nietypowe odległości), ale zależy od stabilności detekcji punktów w realnym oświetleniu. [19]
+
 Lightweight/edge-optimized: pruning, quantization, distillation
+
 W smartfonowym eye trackingu krytyczna jest latencja i koszt energetyczny. W pracy o DynamicGaze i „edge intelligence” mierzone inference time na telefonie Samsung S22 dla modeli TFLite to średnio ok. 742 ms (iTracker), 256 ms (CNN), 415 ms (CNN+GRU) i 426 ms (CNN+LSTM), przy zastrzeżeniu, że to „czysty” czas modelu bez przechwytywania klatek i preprocessing’u. [14] Autorzy testują też optimizacje: quantization i pruning, pokazując, że na przykład na Intel NUC (edge) quantization może znacząco skrócić czas inferencji, ale zwykle zwiększa RMSE (np. CNN+LSTM: 0.955→1.192 cm po quantization, a do 1.366 cm po pruning w ich eksperymencie). [20] Z punktu widzenia praktyk wdrożeniowych, dokumentacja TensorFlow Lite opisuje post‑training quantization jako narzędzie redukcji latencji i zużycia energii, kosztem potencjalnego spadku dokładności. [21]
+
 Knowledge distillation jest ogólną rodziną technik kompresji „teacher→student” szeroko opisaną w literaturze (strategie, typy wiedzy, schematy uczenia), a nowsze prace zaczynają stosować distillation wprost do celów on‑device gaze estimation (np. preprint DistillGaze). [22] W mobilnym eye trackingu distillation jest szczególnie atrakcyjne, gdy „teacher” może być dużym modelem trenowanym na danych syntetycznych/heterogenicznych, a „student” ma działać na TFLite/CoreML w ograniczonym budżecie pamięci. [23]
+
 Fuzja sensorów: RGB, RGB‑D, NIR/IR, IMU
+
 RGB pozostaje standardem, bo jest powszechny i tani; większość prac mobilnych w przeglądach handheld bazuje na RGB (front‑facing). [24]
+
 RGB‑D (czujniki głębi w telefonach) umożliwia jawne uwzględnienie odległości i orientacji twarzy; RGBDGaze wykorzystuje kamerę RGB i czujnik głębi TrueDepth (iPhone X+) i pokazuje redukcję błędu: 1.89 cm dla modelu multimodalnego vs 2.26 cm dla samego RGB (16.3% poprawy) w różnych kontekstach (stanie, chodzenie, siedzenie, leżenie). [25]
+
 NIR/IR – przegląd handheld zauważa wzrost liczby telefonów z kamerami NIR (m.in. iPhone i wybrane marki Android), co sprzyja stabilniejszej detekcji oka przy trudnym oświetleniu i może przybliżać mobilne systemy do jakości rozwiązań PCCR. [26]
+
 IMU – dane inercyjne pomagają wykrywać zmiany ruchu/postawy urządzenia i inicjować rekalkibrację lub adaptację modelu. MAC‑Gaze łączy wizualny gaze estimator z modelem rozpoznania aktywności z IMU, uruchamiając ciągłą kalibrację i redukując błąd m.in. na RGBDGaze (1.73→1.41 cm) oraz na MotionGaze (2.81→1.92 cm). [27] W warstwie „systemowej” podobną intuicję widać także w patentach: np. US20160282937A1 zakłada identyfikację ruchu obrotowego urządzenia (np. z żyroskopu) i łączenie jej z modelowaniem 3D twarzy, potencjalnie także z użyciem kamery IR. [28]
 
 flowchart TD
@@ -59,25 +88,44 @@ flowchart TD
   A --> N[Depth/NIR (opcjonalnie)]
   N --> C
 
+
 Rozwiązania komercyjne i open-source
+
 Komercyjne i „research-grade” ekosystemy
+
 Tobii Pro Glasses 3 to przykład mobilnego (nagłownego) rozwiązania badawczego; producent opisuje stosowanie PCCR (pupil center + corneal reflection) do wyznaczania punktu spojrzenia oraz deklaruje rejestrację „raw eye tracking data” do 100 Hz, co ma wystarczać do większości zjawisk takich jak fiksacje i miary źrenicy. [29] Tobii udostępnia Tobii Pro SDK do budowy aplikacji analitycznych, w tym strumienie typu gaze position, gaze origin, pupil size oraz synchronizację z urządzeniami zewnętrznymi (zależnie od trackera). [30]
+
 Pupil Labs oferuje zarówno platformę open‑source (Pupil Core) z repozytorium kodu, jak i nowsze urządzenia mobilne (np. Neon) oraz dokumentację strumieni danych; Pupil Core jest rozwijany jako otwarta platforma, a producent udostępnia specyfikacje i raporty walidacyjne (np. Neon accuracy test report na Zenodo). [31]
+
 Warto podkreślić różnicę: raport dotyczy głównie eye trackingu „na urządzeniu mobilnym” (smartfon/tablet), natomiast wiele komercyjnych systemów „mobilnych” to eye trackery nagłowne, które mogą być używane w badaniach z użyciem smartfona, ale nie są to algorytmy działające wyłącznie na froncie telefonu. [32]
+
 Open-source i narzędzia badawcze
+
 W obszarze software’owym i replikowalności istotne są:
+
 OpenGaze – toolkit „dla projektantów interfejsów” mający demokratyzować użycie appearance‑based gaze estimation w HCI, z implementacjami metod i komponentów interakcyjnych. [33]
+
 WebGazer.js – otwarta biblioteka eye trackingu w przeglądarce, samokalibrująca się na podstawie interakcji użytkownika; bywa używana również na urządzeniach mobilnych via kamera frontowa, choć zwykle z ograniczoną dokładnością względem rozwiązań badawczych. [34]
+
 GazeML – framework (repozytorium) integrujące implementacje opublikowanych algorytmów gaze estimation, użyteczne jako „warsztat” porównawczy (z zastrzeżeniem jakości re‑implementacji). [35]
+
 GazeCapture/iTracker – projekt i dane (GazeCapture) oraz referencyjna praca iTracker stanowią punkt odniesienia dla mobilnej estymacji spojrzenia na RGB. [36]
+
 RGBDGaze – repozytorium kodu i link do datasetu (RGB+Depth) dla smartfonów, wprost adresujące zmienność kontekstu użycia. [37]
+
 MobileEye (Gunawardena i in.) – autorzy podają dostępność kodu i modeli dla smartfonowego eye trackingu na bodźcach dynamicznych. [38]
+
 Metryki, tabela porównawcza i metaanaliza wyników
+
 Metryki porównawcze i problemy porównywalności
+
 Najczęściej raportowane są: błąd na ekranie (cm, np. średnia odległość euklidesowa / RMSE) oraz błąd kątowy (°) dla gaze direction. [39] W praktyce „ten sam” błąd cm nie jest w pełni porównywalny bez informacji o: rozmiarze ekranu, odległości obserwacji (cm), protokole kalibracji, typie bodźca (statyczny punkt vs moving dot vs real content), oraz czy błąd liczono na całej sekwencji czy po odrzuceniu np. pierwszych 800 ms po pojawieniu się bodźca (saccade latency). [40]
 W dodatku część prac raportuje tylko inference time modelu, a część pełną latencję pipeline’u (capture + face detect + preprocess + infer), co prowadzi do istotnie różnych wniosków o „real‑time”. [41]
+
 Tabela porównawcza metod i implementacji
+
 Poniżej zestawiono reprezentatywne metody/implementacje (akademickie i systemowe) raportujące metryki mobilne. Puste pola oznaczają brak danych w cytowanym źródle lub nieporównywalność raportowania.
+
 Metoda / system	Klasa	Sensory	Dane / kontekst	Kalibracja	Dokładność (przykład)	Szybkość / latencja	Złożoność (param.)	Uwagi o odporności
 iTracker (Krafka 2016)	CNN appearance	RGB	GazeCapture (telefony/tablety)	opcjonalna	1.71 cm (phone) i 2.53 cm (tablet) bez kalibr.; 1.34 / 2.12 cm z kalibr. [42]	10–15 fps na mobilnym urządzeniu [43]	(nie raport w tej pracy)	wrażliwy na head pose/occlusions typowe dla mobile
 Smartphone eye tracking (Valliappan 2020)	CNN + personalizacja	RGB + landmarki	telefon (Pixel 2 XL), zadania okulomotoryczne	tak (≈30 s; ~100 klatek kal.)	1.92±0.20 cm base → 0.46±0.03 cm po personalizacji; percentyle [5,95]=[0.31,0.72] cm [44]	(online możliwe; analizy też offline) [45]	~170k parametrów (lekki) [45]	spadek jakości przy większym pan/tilt/roll i dystansie [45]
@@ -88,15 +136,23 @@ RGBDGaze (Arakawa 2022)	multimodal CNN	RGB + Depth	4 konteksty (chodzenie/siedze
 EasyGaze (2022)	hybrid	RGB	handheld; testy oświetlenia/rozdz.	(niejednozn.)	~1.93° przy 96×48 i oświetleniu frontalnym [18]	(brak)	(brak)	silna zależność od warunków oświetlenia [18]
 MAC‑Gaze (2025)	system adaptacyjny	RGB(+Depth) + IMU	RGBDGaze + MotionGaze	„continual calibration”	RGBDGaze: 1.73→1.41 cm; MotionGaze: 2.81→1.92 cm [27]	(brak publicznej latencji w streszczeniu)	(brak)	wykrywa motion‑states i uruchamia rekalkibrację [49]
 Apple ARKit (jako baseline w RGBDGaze)	SDK / model‑based-ish	(TrueDepth/NIR zależnie od urządzenia)	w porównaniu RGBDGaze	(wbudowane)	6.38 cm (wg tabeli porównawczej RGBDGaze) [25]	(brak)	(n/d)	oferuje m.in. lookAtPoint i transformacje oczu [50]
+
 Analiza statystyczna i „metaanaliza” na dostępnych danych
+
 Podgrupa: DynamicGaze (jedno źródło danych, jednolita metryka)
+
 DynamicGaze podaje RMSE (cm) dla czterech modeli na tym samym zbiorze; to rzadki przypadek umożliwiający porównanie w obrębie jednolitego protokołu. Na DynamicGaze modele temporalne poprawiają wynik względem CNN:
     • poprawa CNN+LSTM vs CNN: (1.468 − 0.955) / 1.468 ≈ 34.9% redukcji RMSE,
     • poprawa CNN+GRU vs CNN: (1.468 − 1.091) / 1.468 ≈ 25.7% redukcji RMSE. [46]
+
 Autorzy raportują test istotności: ANOVA wskazuje istotne różnice RMSE między modelami (F(3,396)=254.42, p<0.001), a Tukey HSD wskazuje CNN+LSTM jako istotnie lepszy od CNN, CNN+GRU i iTracker w ich warunkach. [51]
+
 Trade-off accuracy–latency: wyniki on-device (S22) i edge
+
 W tym samym badaniu inference time na Samsung S22 (TFLite) pokazuje, że uzyskanie <33 ms/klatkę (≈30 FPS) jest dalekie dla rozważanych modeli (255–742 ms/model), nawet przed doliczeniem detekcji twarzy i preprocessingu. [14] Z kolei eksperymenty edge pokazują, że optymalizacja i mocniejszy „nearby compute” może zbliżać się do bardziej interaktywnych czasów całkowitych, ale face detection nadal jest istotnym składnikiem (np. setki ms na słabszych urządzeniach). [41]
+
 Wpływ personalizacji (Valliappan 2020) jako „boxplot” jakości
+
 Dane Valliappan i in. umożliwiają częściową analizę rozkładu błędu po personalizacji: średnio 0.46 cm, z najlepszym uczestnikiem 0.23 cm, najgorszym 0.75 cm oraz percentylami [5,95]=[0.31,0.72] cm. [45] To sugeruje, że nawet przy podobnym protokole kalibracji, istnieje znaczna wariancja międzyosobnicza, istotna dla projektowania „quality control” (np. odrzucanie użytkowników z >1 cm na hold‑out). [45]
 
 xychart-beta
@@ -105,39 +161,63 @@ xychart-beta
   y-axis "RMSE (cm)" 0 --> 1.6
   bar [1.468, 1.091, 0.955, 1.499]
 Źródło wartości: tabela wyników DynamicGaze. [46]
+
 xychart-beta
   title "Inference time (ms) na Samsung S22 (model-only, TFLite)"
   x-axis ["CNN", "CNN+GRU", "CNN+LSTM", "iTracker"]
   y-axis "ms" 0 --> 800
   bar [255.67, 414.81, 426.18, 742.22]
 Uwaga: bez czasu przechwytywania klatki, detekcji twarzy i preprocessingu. [14]
+
 Detekcja ruchów oczu i analiza zdarzeń w strumieniu danych
+
 Rodzaje zdarzeń okulomotorycznych
+
 W analizie eye‑trackingowej standardowo rozróżnia się m.in.: fiksacje (okresy względnej stabilizacji spojrzenia), sakkady (szybkie przerzuty spojrzenia między fiksacjami), sekwencje fiksacja–sakkada (scanpath), a także miary źrenicy i mrugnięcia jako wskaźniki obciążenia poznawczego. [52] Dla urządzeń mobilnych dochodzi wyraźniej problem rozdzielenia ruchu oka od ruchu głowy i od ruchu urządzenia, co wpływa na detekcję zdarzeń w danych niskiej częstotliwości i obarczonych szumem. [53]
+
 Klasyczne algorytmy detekcji zdarzeń
+
 Salvucci i Goldberg proponują taksonomię algorytmów identyfikacji fiksacji/sakkad i omawiają rodzinę metod opartych o progi czasowo‑przestrzenne. [54] Najczęściej spotyka się:
-    • I‑DT (dispersion‑threshold): grupuje próbki, które mieszczą się w ograniczonej dyspersji przestrzennej przez minimalny czas (dobre dla fiksacji, wrażliwe na próg i rozdzielczość). [55]
-    • I‑VT (velocity‑threshold): klasyfikuje próbki na podstawie prędkości kątowej/spojrzenia, rozdzielając „wolne” fiksacje od szybkich sakkad; w mobilnych systemach bywa używany jako prosty filtr zdarzeń. [56]
-    • HMM / metody probabilistyczne: modelują stany (fiksacja/sakkada/…) i przejścia między nimi, co bywa bardziej odporne na szum, ale zwiększa koszt obliczeniowy i wymaga strojenia. [57]
+  
+- I‑DT (dispersion‑threshold): grupuje próbki, które mieszczą się w ograniczonej dyspersji przestrzennej przez minimalny czas (dobre dla fiksacji, wrażliwe na próg i rozdzielczość). [55]
+
+- I‑VT (velocity‑threshold): klasyfikuje próbki na podstawie prędkości kątowej/spojrzenia, rozdzielając „wolne” fiksacje od szybkich sakkad; w mobilnych systemach bywa używany jako prosty filtr zdarzeń. [56]
+
+- HMM / metody probabilistyczne: modelują stany (fiksacja/sakkada/…) i przejścia między nimi, co bywa bardziej odporne na szum, ale zwiększa koszt obliczeniowy i wymaga strojenia. [57]
+
 W badaniu smartphone eye tracking Valliappan i in. klasyfikowano zdarzenia (sakkady/fiksacje) z progiem prędkości 22°/s, wskazując na mobilny, pragmatyczny kompromis: niski koszt i działanie na danych 30 Hz, kosztem ograniczonej czułości na mikro‑ruchy. [45]
 Detekcja microsakkad i ograniczenia mobilne
+
 Microsakkady wymagają zwykle wysokiej częstotliwości próbkowania i niskiego szumu; klasyczny algorytm Engbert–Kliegl opiera się o próg prędkości skalowany odchyleniem standardowym prędkości w oknie czasowym. [58] Smartfony pracujące na 30–60 Hz (często mniej stabilnie) zwykle nie dostarczają jakości porównywalnej z trackerami 200–1000+ Hz, przez co wiarygodna detekcja microsakkad na samym RGB bywa trudna lub niestabilna; literatura mobilna częściej koncentruje się na fiksacjach, sakkadach i miernikach „saliency‑like”. [59]
+
 Skuteczność i koszty obliczeniowe detektorów zdarzeń
+
 Porównania algorytmów detekcji zdarzeń pokazują, że różne metody (progowe i bardziej złożone) mogą dawać znacząco różne klasyfikacje nawet na tym samym sygnale; dlatego zaleca się raportować parametry algorytmu i weryfikować je w zależności od zadania. [60] W kontekście mobilnym rekomenduje się:
-    • dla interakcji w czasie rzeczywistym: proste I‑VT / adaptacyjne progi prędkości (niskie koszty, łatwe do wdrożenia na edge), [61]
-    • dla analiz offline: bardziej rozbudowane metody (adaptacyjne, HMM) oraz walidacje jakości (np. porównanie do ręcznej anotacji lub do eye trackera IR). [62]
+
+- dla interakcji w czasie rzeczywistym: proste I‑VT / adaptacyjne progi prędkości (niskie koszty, łatwe do wdrożenia na edge), [61]
+
+- dla analiz offline: bardziej rozbudowane metody (adaptacyjne, HMM) oraz walidacje jakości (np. porównanie do ręcznej anotacji lub do eye trackera IR). [62]
+
+
 Ograniczenia badań, luki i rekomendacje
+
 Najważniejsze ograniczenia obecnej literatury i wdrożeń to:
 Brak standaryzacji oceny i „nieporównywalność” wyników: przeglądy podkreślają rozjazd w metrykach (cm vs °), protokołach pre/post‑processingu, konwersjach 2D/3D oraz raportowaniu dokładności i robustności, co utrudnia formalną metaanalizę między pracami. [3]
+
 „Real‑world motion gap”: dane treningowe często nie obejmują realistycznego zakresu ruchu i postaw (chodzenie, leżenie, trzymanie telefonu pod nietypowym kątem). Prace empiryczne pokazują spadek jakości przy zmianach head pose i orientacji urządzenia; dlatego rośnie znaczenie RGB‑D, IMU i adaptacyjnych metod rekalkibracji/continual learning. [63]
+
 Bottlenecks obliczeniowe: nawet jeśli sam model jest umiarkowany, pipeline (zwłaszcza detekcja twarzy) może dominować. Wyniki DynamicGaze pokazują, że czasy inference modelu na telefonie są rzędu setek ms i same w sobie nie gwarantują interaktywności; edge offloading i optymalizacje (quantization) pomagają, ale zwykle wprowadzają spadek dokładności. [64]
+
 Kalibracja vs użyteczność: personalizacja potrafi radykalnie poprawiać dokładność (np. ~0.46 cm przy ~30 s kalibracji), ale zwiększa tarcie UX i komplikuje scenariusze masowe. Niezbędne są lepsze metody kalibracji implicit/continual oraz kontrola jakości (detekcja driftu, automatyczne „re‑calibration triggers”). [65]
+
 Rekomendacje badawcze i inżynierskie:
-    • raportować pełny „system latency budget” (capture + face/eye detect + preprocess + model) oraz energię/pamięć, a nie tylko inference time sieci; [41]
-    • wprowadzać benchmarki mobilne obejmujące realne postawy i ruch (jak RGBDGaze/DynamicGaze/MotionGaze) oraz jawnie raportować zakres odległości i head‑pose; [66]
-    • projektować modele „motion‑aware”: fuzja RGB‑D, IMU‑triggered continual calibration, a także interpretowalne hybrydy (cechy + CNN) dla lepszej kontroli poza rozkładem; [67]
-    • dla wdrożeń: agresywnie stosować kwantyzację/pruning/distillation, ale zawsze raportować degradację RMSE i odporności w scenariuszach „in the wild”, bo trade‑off bywa nieliniowy (np. większy spadek dla modeli rekurencyjnych). [68]
+
+- raportować pełny „system latency budget” (capture + face/eye detect + preprocess + model) oraz energię/pamięć, a nie tylko inference time sieci; [41]
+- wprowadzać benchmarki mobilne obejmujące realne postawy i ruch (jak RGBDGaze/DynamicGaze/MotionGaze) oraz jawnie raportować zakres odległości i head‑pose; [66]
+- projektować modele „motion‑aware”: fuzja RGB‑D, IMU‑triggered continual calibration, a także interpretowalne hybrydy (cechy + CNN) dla lepszej kontroli poza rozkładem; [67]
+- dla wdrożeń: agresywnie stosować kwantyzację/pruning/distillation, ale zawsze raportować degradację RMSE i odporności w scenariuszach „in the wild”, bo trade‑off bywa nieliniowy (np. większy spadek dla modeli rekurencyjnych). [68]
 Referencje
+
     1. Lei Y, He S, Khamis M, Ye J. An End-to-End Review of Gaze Estimation and its Interactive Applications on Handheld Mobile Devices. ACM Comput Surv. 2023. doi:10.1145/3606947. [69]
     2. Krafka K, Khosla A, Kellnhofer P, et al. Eye Tracking for Everyone. Proc CVPR. 2016. [70]
     3. Valliappan N, Dai N, Steinberg E, et al. Accelerating eye movement research via accurate and affordable smartphone eye tracking. Nat Commun. 2020;11:4553. [44]
