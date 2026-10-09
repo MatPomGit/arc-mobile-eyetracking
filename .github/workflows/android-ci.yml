@@ -1,12 +1,35 @@
 name: Android research scaffold
 
 on:
-  # Heavy build reserved for approved local Andromeda execution or
-  # manually authorized one-off when provider budget is available.
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "gradle/**"
+      - "gradle.properties"
+      - "gradlew"
+      - "gradlew.bat"
+      - "settings.gradle.kts"
+      - "build.gradle.kts"
+      - ".github/workflows/android-ci.yml"
+  pull_request:
+    paths:
+      - "app/**"
+      - "gradle/**"
+      - "gradle.properties"
+      - "gradlew"
+      - "gradlew.bat"
+      - "settings.gradle.kts"
+      - "build.gradle.kts"
+      - ".github/workflows/android-ci.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: gaze-android-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   unit-tests:
