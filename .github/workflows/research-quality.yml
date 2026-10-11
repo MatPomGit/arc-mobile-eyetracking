@@ -2,6 +2,7 @@ name: Research quality manifest
 
 on:
   push:
+    branches: [main]
     paths:
       - "research/**"
       - "docs/**"
@@ -19,6 +20,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: public-research-quality-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   quality-manifest:
