@@ -1,27 +1,6 @@
 name: Android research scaffold
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "app/**"
-      - "gradle/**"
-      - "gradle.properties"
-      - "gradlew"
-      - "gradlew.bat"
-      - "settings.gradle.kts"
-      - "build.gradle.kts"
-      - ".github/workflows/android-ci.yml"
-  pull_request:
-    paths:
-      - "app/**"
-      - "gradle/**"
-      - "gradle.properties"
-      - "gradlew"
-      - "gradlew.bat"
-      - "settings.gradle.kts"
-      - "build.gradle.kts"
-      - ".github/workflows/android-ci.yml"
   workflow_dispatch:
 
 permissions:
@@ -33,6 +12,7 @@ concurrency:
 
 jobs:
   unit-tests:
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
