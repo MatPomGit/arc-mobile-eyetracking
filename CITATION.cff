@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use software, protocols, or research artifacts from this repository, please cite this repository and any relevant published manuscript."
+title: "ARC Mobile Eye Tracking"
+type: software
+authors:
+  - family-names: Pomianek
+    given-names: Mateusz
+    affiliation: Politechnika Rzeszowska
+repository-code: https://github.com/MatPomGit/arc-mobile-eyetracking
+license: Apache-2.0
