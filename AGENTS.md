@@ -55,3 +55,6 @@ For native Android UI written in Kotlin, use Jetpack Compose and Material 3 for 
 Existing Views/XML, fragments, LiveData or other working UI need not be rewritten. Migrate incrementally only when modifying relevant screens, with appropriate regression and accessibility checks. Preserve existing behavior, lifecycle handling, performance, and tests. Do not introduce Compose into Python, Unity, web or non-Android modules solely to satisfy this rule. Follow KISS; reuse existing components and avoid speculative abstractions or dependencies.
 
 Reference: https://android-developers.googleblog.com/2026/05/android-ui-development-is-compose-first.html
+
+## Uzupełnienie cyklu agentowego (2026-10-31)
+- Przed wyborem JUMP, rezerwacją Issues, wykorzystaniem skilli, testowaniem i review czytaj [procedurę](docs/development/agent-workflow.md). Nie rozszerza ona prawa do danych twarzy i uczestników ani nie stanowi dowodu skuteczności eyetrackera.

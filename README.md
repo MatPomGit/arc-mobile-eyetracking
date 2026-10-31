@@ -39,3 +39,5 @@ Before participant-facing validation:
 - add deterministic synthetic/unit tests for geometry and export;
 - freeze the first engineering benchmark protocol;
 - complete the applicable ethics/privacy route for any human validation.
+
+Agent governance: [AGENTS.md](AGENTS.md), [autonomous research procedure](docs/development/agent-workflow.md).
