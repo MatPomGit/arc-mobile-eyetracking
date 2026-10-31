@@ -1,6 +1,6 @@
 # Procedura badań i pracy agentów
 
-**Wersja:** 1.0.0 (2026-10-31). Uzupełnienie [AGENTS.md](../../AGENTS.md). Nie upoważnia do badań z ludźmi ani używania prywatnego wideo.
+**Wersja:** 1.0.0 (2026-10-31). Uzupełnienie `AGENTS.md` w katalogu głównym. Nie upoważnia do badań z ludźmi ani używania prywatnego wideo.
 
 ## Wybór zadania
 Przeczytaj PROJECT_STATE.yaml, research/quality_manifest.yaml, docs/research_plan.md i docs/measurement_contract.md oraz aktualne main, Issues, milestones, PR i CI. Dokończ istniejące PR przed nowym feature. DoR: cel, mierzalny wynik, zależności, uprawnienia, bezpieczeństwo danych i kryteria akceptacji. Rezerwuj Issue z istniejącym Research Autopilot (jedyny kontroler); nie twórz drugiej kolejki. Limit jeden aktywny feature PR na repozytorium i pięć w portfolio. Skille wybieraj po sprawdzeniu wersji, pochodzenia, dostępności i minimalnych uprawnień.
